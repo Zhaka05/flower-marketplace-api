@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина</title>
+</head>
+<body>
+    {% for flower in cart %}
+
+    <p>Название: {{flower.name}}
+    <p>ID: {{flower.id}}</p>
+    <p>кол-во: {{flower.count}}</p>
+    <p>цена: {{flower.cost}}</p>
+    <form action="/purchased" method="post">
+        <input type="text" name="flower_id">
+        <input type="submit" value="purchase">
+    </form>
+    {% endfor %}
+</body>
+</html>
