@@ -1,8 +1,7 @@
-from attrs import define
+# from attrs import define
+from pydantic import BaseModel
 
-
-@define
-class User:
+class User(BaseModel):
     email: str
     full_name: str
     password: str
