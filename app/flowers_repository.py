@@ -1,4 +1,7 @@
-# from attrs import define
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from .database import Base
 from pydantic import BaseModel
 
 class Flower(BaseModel):
@@ -7,6 +10,16 @@ class Flower(BaseModel):
     cost: int
     id: int = 0
 
+# id, name, count, cost
+
+class Flower(Base):
+    __tablename__ = "flowers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    count = Column(Integer, index=True)
+    cost = Column(Integer, index=True)
+    purchases = relationship("Purchase", back_populates="flower")
 
 class FlowersRepository:
     flowers: list[Flower]

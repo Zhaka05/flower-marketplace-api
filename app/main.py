@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Depends, Request, Response, Form, Cookie, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-# from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from jose import jwt
 import json
@@ -9,6 +8,10 @@ from .flowers_repository import Flower, FlowersRepository
 from .purchases_repository import Purchase, PurchasesRepository
 from .users_repository import User, UsersRepository
 from pydantic import BaseModel
+
+from .database import Base, engine
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

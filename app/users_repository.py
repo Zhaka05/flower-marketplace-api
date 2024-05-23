@@ -1,4 +1,7 @@
-# from attrs import define
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from .database import Base
 from pydantic import BaseModel
 
 class User(BaseModel):
@@ -6,6 +9,19 @@ class User(BaseModel):
     full_name: str
     password: str
     id: int = 0
+
+
+# table view
+# id, email, full_name, password
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True)
+    full_name = Column(String, index=True)
+    password = Column(String, index=True)
+
+    purchases = relationship("Purchase", back_populates="user")
 
 
 class UsersRepository:
