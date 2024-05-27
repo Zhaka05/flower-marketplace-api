@@ -1,10 +1,12 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 
+from attrs import define
 from .database import Base
 from pydantic import BaseModel
 
-class User(BaseModel):
+@define
+class UserCreate():
     email: str
     full_name: str
     password: str
@@ -25,28 +27,27 @@ class User(Base):
 
 
 class UsersRepository:
-    users: list[User]
+    # users: list[User]
 
-    def __init__(self):
-        self.users = []
+    # def __init__(self):
+    #     self.users = []
 
     # необходимые методы сюда
     # save
-    def save(self, user: User):
-        user.id = len(self.users) + 1
-        self.users.append(user)
+
+    def save(self, db: Session, user: UserCreate) -> User | None:
+        db_user = User(email=user.email, full_name=user.full_name, password=user.password)
+        db.add(db_user)
+        db.commit()
+        db.refresh()
+        return db_user
+        
 
     # get_one
-    def get_by_email(self, email: str) -> User:
-        for user in self.users:
-            if user.email == email:
-                return user
-        return None
+    def get_by_email(self, db: Session, email: str) -> User | None:
+        return db.query(User).filter(User.email == email).first()
     
-    def get_by_id(self, id: int):
-        for user in self.users:
-            if user.id == id:
-                return user
-        return None
+    def get_by_id(self, db: Session, id: int) -> User | None:
+        return db.query(User).filter(User.id == id).first()
 
     # конец решения

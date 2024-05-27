@@ -1,10 +1,12 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 
 from .database import Base
 from pydantic import BaseModel
 
-class Flower(BaseModel):
+from attrs import define
+@define
+class FlowerCreate():
     name: str
     count: int
     cost: int
@@ -22,27 +24,33 @@ class Flower(Base):
     purchases = relationship("Purchase", back_populates="flower")
 
 class FlowersRepository:
-    flowers: list[Flower]
+    # flowers: list[Flower]
 
-    def __init__(self):
-        self.flowers = []
+    # def __init__(self):
+    #     self.flowers = []
 
     # необходимые методы сюда
-    def get_id(self) -> int:
-        return len(self.flowers) + 1
 
-    def save(self, flower: Flower):
-        flower.id = self.get_id()
-        self.flowers.append(flower)
+    def save(self, db: Session, flower: FlowerCreate) -> Flower:
+        db_flower = Flower(name=flower.name, count=flower.count, cost=flower.cost)
+        db.add(db_flower)
+        db.commit()
+        db.refresh()
+
+        return db_flower
     
-    def get_by_id(self, id: int) -> Flower:
-        for flower in self.flowers:
-            if flower.id == id:
-                return flower
-        return None
+    def get_by_id(self, db: Session, id: int) -> Flower:
+        return db.query(Flower).filter(Flower.id == id).first()
     
-    def get_all(self) -> list[Flower]:
-        return self.flowers
+    def get_all(self, db: Session, offset: int = 0, limit: int = 5) -> list[Flower]:
+        return db.query(Flower).offset(offset).limit(limit).all()
     
+    def delete_flower(self, db: Session, flower_id: int):
+        db_flower = db.query(Flower).filter(Flower.id == flower_id).first()
+        db.delete(db_flower)
+        db.commit()
+        db.refresh()
+        return db_flower
+
 
     # конец решения
